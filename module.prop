@@ -4,3 +4,4 @@ version=v1.0.0
 versionCode=100
 author=Rama-X2
 description=Adds Xiaomi charging connect and disconnect sounds to all Android devices and custom ROMs (especially SuperiorOS). Includes a smart background service.
+updateJson: https://raw.githubusercontent.com/Rama-X2/Xiaomi-Charging-Sound/main/update.json

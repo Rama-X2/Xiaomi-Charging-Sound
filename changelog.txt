@@ -1,0 +1,8 @@
+Changelog for Xiaomi Charging Sound (Universal)
+
+v1.0 (Initial Release)
+- Added authentic Xiaomi charging connection sound (charging.ogg)
+- Added authentic Xiaomi charging disconnection sound (disconnect.ogg)
+- Created a background service (service.sh) to monitor power state changes via sysfs
+- Compiled and bundled PlayAudio.dex, a headless Java audio player executed via app_process to ensure sound play is fully background, lag-free, and cross-ROM compatible
+- Added fallback overlay files for stock Android systems

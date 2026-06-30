@@ -1,6 +1,10 @@
 Changelog for Xiaomi Charging Sound (Universal)
 
-v1.4.0 (Latest Release)
+v1.7.0 (Latest Release)
+- Fixed Android 13+ Scoped Storage (MediaProvider) Permission Issue: Refactored the Java audio player (PlayAudio.java) to stream audio bytes directly through a custom MediaDataSource callback, completely bypassing file descriptor conversion checks (convertToModernFd) which previously caused NullPointerException on headless JVMs (custom ROMs/SuperiorOS).
+- Cleared out previous redundant zip files inside target module folder.
+
+v1.4.0
 - Added standard flashable installer wrapper scripts (META-INF/com/google/android/update-binary and updater-script) to fix systemless installation and script execution permissions (chmod +x) when flashed via Magisk.
 - Enhanced battery/charger driver sysfs polling logic in service.sh (checks battery status and scans other active power supplies like USB/AC) for universal compatibility with MediaTek (Redmi 10a) and Snapdragon devices.
 - Added debug logging capability to write background daemon and Java stack trace outputs to log.txt.

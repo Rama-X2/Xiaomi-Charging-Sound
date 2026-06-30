@@ -1,5 +1,16 @@
 Changelog for Xiaomi Charging Sound (Universal)
 
+v2.0.0 (Latest Major Release)
+- Converted background listener to a persistent Java daemon. The JVM is launched once at boot, reducing plug-in and plug-out sound delay to under 10ms (instant response).
+- Isolated audio playback to the System/Notification stream (via USAGE_ASSISTANCE_SONIFICATION) instead of the Music/Media volume stream. This ensures the volume is controlled independently of your media volume setting.
+- Implemented immediate playback cutoff: if the charger is plugged/unplugged rapidly, the playing sound is immediately stopped and reset before the new sound is played, preventing sound overlaps and audio stuttering.
+- Fixed Android 13+ Scoped Storage (MediaProvider) Permission Issue: Refactored the Java audio player (PlayAudio.java) to stream audio bytes directly through a custom MediaDataSource callback, completely bypassing file descriptor conversion checks (convertToModernFd) which previously caused NullPointerException on headless JVMs (custom ROMs/SuperiorOS).
+- Prevented Low Memory Killer (LMK) Terminations: Set the Java daemon's OOM score adjustment (oom_score_adj) to -1000 to guarantee it is never killed by the kernel's memory manager.
+- Added uninstall.sh: Installs a clean uninstallation trigger that restores your device's default system charging sound setting (secure charging_sounds_enabled 1) when the module is removed.
+- Cleared out previous redundant zip files inside target module folder.
+
+Changelog for Xiaomi Charging Sound (Universal)
+
 v1.7.0 (Latest Release)
 - Fixed Android 13+ Scoped Storage (MediaProvider) Permission Issue: Refactored the Java audio player (PlayAudio.java) to stream audio bytes directly through a custom MediaDataSource callback, completely bypassing file descriptor conversion checks (convertToModernFd) which previously caused NullPointerException on headless JVMs (custom ROMs/SuperiorOS).
 - Cleared out previous redundant zip files inside target module folder.

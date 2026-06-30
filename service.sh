@@ -8,71 +8,30 @@ done
 # Sleep an extra 5 seconds to ensure system services are stabilized
 sleep 5
 
-# Disable system-native charging sound to prevent double playback
-settings put secure charging_sounds_enabled 0
-
-# Paths
 MODDIR="/data/adb/modules/xiaomi_charging_sound"
 PLAY_DEX="$MODDIR/PlayAudio.dex"
 CONNECT_SOUND="$MODDIR/charging.ogg"
 DISCONNECT_SOUND="$MODDIR/disconnect.ogg"
-STATUS_FILE="/sys/class/power_supply/battery/status"
 
-# Function to play sound
-play_sound() {
-    local file="$1"
-    if [ -f "$file" ]; then
-        export CLASSPATH="$PLAY_DEX"
-        # Run in background to prevent blocking the monitoring loop
-        app_process /system/bin PlayAudio "$file" >/dev/null 2>&1 &
-    fi
+# Initialize log file
+echo "$(date '+%Y-%m-%d %H:%M:%S') - Service starting..." > "$MODDIR/log.txt"
+
+# Disable system-native charging sound to prevent double playback
+settings put secure charging_sounds_enabled 0 >> "$MODDIR/log.txt" 2>&1
+
+log_msg() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$MODDIR/log.txt"
 }
 
-# Helper to check if status means plugged in
-is_plugged() {
-    local status="$1"
-    if [ "$status" = "Charging" ] || [ "$status" = "Full" ]; then
-        return 0 # True
-    else
-        return 1 # False
-    fi
-}
+export CLASSPATH="$PLAY_DEX"
+# Start the persistent Java daemon process in the background and redirect output to log.txt
+app_process /system/bin PlayAudio "$CONNECT_SOUND" "$DISCONNECT_SOUND" >> "$MODDIR/log.txt" 2>&1 &
 
-# Get initial state
-if [ -f "$STATUS_FILE" ]; then
-    initial_status=$(cat "$STATUS_FILE")
+# Prevent the daemon from being terminated by Android's Low Memory Killer (LMK)
+PID=$!
+if [ ! -z "$PID" ]; then
+    echo -1000 > "/proc/$PID/oom_score_adj" 2>/dev/null
+    log_msg "Started Java daemon with PID $PID and set oom_score_adj to -1000"
 else
-    initial_status="Discharging"
+    log_msg "Warning: Failed to retrieve PID of Java daemon"
 fi
-
-if is_plugged "$initial_status"; then
-    last_plugged=1
-else
-    last_plugged=0
-fi
-
-# Monitoring loop
-while true; do
-    if [ -f "$STATUS_FILE" ]; then
-        current_status=$(cat "$STATUS_FILE")
-    else
-        current_status="Discharging"
-    fi
-
-    if is_plugged "$current_status"; then
-        current_plugged=1
-    else
-        current_plugged=0
-    fi
-
-    if [ "$current_plugged" -ne "$last_plugged" ]; then
-        if [ "$current_plugged" -eq 1 ]; then
-            play_sound "$CONNECT_SOUND"
-        else
-            play_sound "$DISCONNECT_SOUND"
-        fi
-        last_plugged="$current_plugged"
-    fi
-    
-    sleep 1
-done

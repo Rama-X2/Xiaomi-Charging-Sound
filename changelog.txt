@@ -9,8 +9,6 @@ v2.0.0 (Latest Major Release)
 - Added uninstall.sh: Installs a clean uninstallation trigger that restores your device's default system charging sound setting (secure charging_sounds_enabled 1) when the module is removed.
 - Cleared out previous redundant zip files inside target module folder.
 
-Changelog for Xiaomi Charging Sound (Universal)
-
 v1.7.0 (Latest Release)
 - Fixed Android 13+ Scoped Storage (MediaProvider) Permission Issue: Refactored the Java audio player (PlayAudio.java) to stream audio bytes directly through a custom MediaDataSource callback, completely bypassing file descriptor conversion checks (convertToModernFd) which previously caused NullPointerException on headless JVMs (custom ROMs/SuperiorOS).
 - Cleared out previous redundant zip files inside target module folder.
